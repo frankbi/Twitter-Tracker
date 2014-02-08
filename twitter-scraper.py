@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 
 from bs4 import BeautifulSoup
 from datetime import datetime
@@ -6,21 +6,25 @@ import requests
 import sys
 import csv
 import re
+import os
 
-def init():
-	with open(sys.argv[1], "r") as csvfile:
-		readit = csv.reader(csvfile, delimiter="\t")
-		for row in readit:
-			usrdata = scrapFollow(row[0], row[1])
-			filename = "data/" + row[0] + ".csv"
-			try:
-				with open(filename) as datafile:
-					datafile.write(usrdata)
-			except IOError:
+def init(ss):
+	if not os.path.exists("data"):
+		os.makedirs("data")
+	with open(ss, "r") as datafile:
+		datas = csv.reader(datafile, delimiter="\t")
+		for row in datas:
+			usrdata = scrapeFollow(row[0], row[1])
+			filename = "data/" + row[0] + ".tsv"
+			if not os.path.exists(filename):
 				with open(filename, "a") as newfile:
-					newfile.write("DATE\tTIME\tNAME\tUSERNAME\tTWEETS\tFOLLOWERS\tFOLLOWING\n" + usrdata)
+					newfile.write("DATE\tTIME\tNAME\tUSERNAME\tTWEETS\tFOLLOWERS\tFOLLOWING\n")
+					newfile.write(usrdata)				 
+			else:
+				with open(filename, "a") as existingfile:
+					existingfile.write(usrdata)
 
-def	scrapFollow(name, handle):
+def	scrapeFollow(name, handle):
 	r = requests.get("http://twitter.com/" + handle)
 	soup = BeautifulSoup(r.text)
 
@@ -49,4 +53,7 @@ def reTweet(string):
 		result = re.sub("<strong>|</strong>", "", string)
 	return result
 
-init()
+if len(sys.argv) < 2:
+	print "Please pass along a valid spreadsheet"
+else:
+	init(sys.argv[1])
