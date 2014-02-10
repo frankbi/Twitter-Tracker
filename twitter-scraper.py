@@ -23,26 +23,31 @@ def init(ss):
 			else:
 				with open(filename, "a") as existingfile:
 					existingfile.write(usrdata)
+	exit()
 
 def	scrapeFollow(name, handle):
 	r = requests.get("http://twitter.com/" + handle)
 	soup = BeautifulSoup(r.text)
 
-	numTweets = soup.findAll("a", {"data-element-term":"tweet_stats"})
-	tweets = numTweets[0].find("strong")
+	valid = re.search("Twitter / ?", str(soup.find("title")))
+	if valid:
+		return "Username does not exist"
+	else:
+		numTweets = soup.findAll("a", {"data-element-term":"tweet_stats"})
+		tweets = numTweets[0].find("strong")
 
-	numFollowers = soup.findAll("a", {"data-element-term":"follower_stats"})
-	followers = numFollowers[0].find("strong")
+		numFollowers = soup.findAll("a", {"data-element-term":"follower_stats"})
+		followers = numFollowers[0].find("strong")
 
-	numFollowing = soup.findAll("a", {"data-element-term":"following_stats"})
-	following = numFollowing[0].find("strong")
+		numFollowing = soup.findAll("a", {"data-element-term":"following_stats"})
+		following = numFollowing[0].find("strong")
 
-	date = datetime.now().strftime('%Y-%m-%d')
-	time = datetime.now().strftime('%H:%M')
+		date = datetime.now().strftime('%Y-%m-%d')
+		time = datetime.now().strftime('%H:%M')
 
-	return date + "\t" + time + "\t" + name  + "\t" + handle + "\t" + reTweet(tweets) + \
-			"\t" +reTweet(followers) + \
-			"\t" + reTweet(following) + "\n"
+		return date + "\t" + time + "\t" + name  + "\t" + handle + "\t" + reTweet(tweets) + \
+				"\t" +reTweet(followers) + \
+				"\t" + reTweet(following) + "\n"
 
 def reTweet(string):
 	string = str(string)
