@@ -25,7 +25,7 @@ def init(ss):
 					existingfile.write(usrdata)
 	exit()
 
-def	scrapeFollow(name, handle):
+def scrapeFollow(name, handle):
 	r = requests.get("http://twitter.com/" + handle)
 	soup = BeautifulSoup(r.text)
 
